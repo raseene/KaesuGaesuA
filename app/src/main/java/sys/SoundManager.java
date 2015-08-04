@@ -23,7 +23,7 @@ public class SoundManager implements Runnable
 		queue	= new ArrayBlockingQueue<SoundCommand>(32, true);		// キュー作成
 		manager	= new SoundManager();
 		thread	= new Thread(manager);
-//		thread.setPriority(9);
+		thread.setPriority(9);
 		thread.start();
 	}
 

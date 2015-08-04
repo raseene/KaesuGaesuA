@@ -55,7 +55,7 @@ void	Renderer::init(int width, int height)
 		limit_rect.y  = (height - limit_rect.h)/2;
 
 		memset(screen_color, 0xff, 4*4);							// スクリーン描画カラー初期化
-		fade_bright	= 0;											// 画面の明るさ
+		fade_bright	= BRIGHT_INIT;									// 画面の明るさ
 		fade_speed	= 0;											// フェードの速さ
 	}
 
