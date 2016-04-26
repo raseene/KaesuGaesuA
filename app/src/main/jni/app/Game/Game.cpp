@@ -31,12 +31,12 @@ enum
 {
 	BTN_LEVEL,							// 難易度
 	BTN_APPLI	= BTN_LEVEL + 4,		// "おすすめアプリ"
+	BTN_GAMES,							// "Playゲーム"
 	BTN_CANCEL,							// "キャンセル"
 	BTN_RESTART,						// "やりなおし"
 	BTN_ANSWER,							// "解答表示/非表示"
 	BTN_EXIT,							// "ゲーム終了"
 	BTN_MENU,							// "メニュー"
-	BTN_COMIC,							// 広告まんが
 };
 
 /*** スプライト *******/
@@ -58,12 +58,12 @@ enum
 
 	SPR_BTN_LEVEL,								// 難易度
 	SPR_BTN_APPLI	= SPR_BTN_LEVEL + 4,		// "おすすめアプリ"
+	SPR_BTN_GAMES,								// "Playゲーム"
 	SPR_BTN_CANCEL,								// "キャンセル"
 	SPR_BTN_RESTART,							// "やりなおし"
 	SPR_BTN_ANSWER,								// "解答表示/非表示"
 	SPR_BTN_EXIT	= SPR_BTN_ANSWER + 2,		// "ゲーム終了"
 	SPR_BTN_MENU,								// "メニュー"
-	SPR_BTN_COMIC,								// 広告まんが
 
 	SPR_MAX,
 };
@@ -103,14 +103,14 @@ SceneGame::SceneGame(void)
 				{"sprite/button.png",		{  0,  64, 400,  64}},			// "ふつう"
 				{"sprite/button.png",		{  0, 128, 400,  64}},			// "むずかしい"
 				{"sprite/button.png",		{  0, 652, 400,  64}},			// "フリーモード"
-				{"sprite/button.png",		{  0, 192, 400,  64}},			// "おすすめアプリ"
+				{"sprite/button.png",		{196, 720, 192,  96}},			// "おすすめアプリ"
+				{"sprite/button.png",		{  0, 720, 192,  96}},			// "Playゲーム"
 				{"sprite/button.png",		{  0, 256, 400,  64}},			// "キャンセル"
 				{"sprite/button.png",		{  0, 320, 400,  64}},			// "やりなおし"
 				{"sprite/button.png",		{  0, 384, 400,  64}},			// "解答表示"
 				{"sprite/button.png",		{  0, 448, 400,  64}},			// "解答非表示"
 				{"sprite/button.png",		{  0, 512, 400,  64}},			// "ゲーム終了"
 				{"sprite/button.png",		{  0, 584, 200,  64}},			// "メニュー"
-				{"sprite/button.png",		{216, 584, 160,  64}},			// 広告まんが
 			};
 
 	int		i, j;
@@ -164,14 +164,14 @@ SceneGame::~SceneGame(void)
  ************/
 int		SceneGame::update(void)
 {
-	if ( dialog_state ) {				// 終了確認ダイアログ表示中
+	if ( dialog_state ) {				// ダイアログ表示中
 		switch ( sys::key_status ) {
 		  case sys::KEY_YES :							// アプリ終了
 			sys::SoundManager::stop();
 			return	SCENE_END;
 
 		  case sys::KEY_NO :							// 戻る
-			sys::SoundManager::set_master_volume(1.0f);
+			sys::SoundManager::set_volume(0, 1.0f);
 			dialog_state = FALSE;
 			break;
 
@@ -180,7 +180,8 @@ int		SceneGame::update(void)
 		}
 	}
 	else if ( sys::key_status == sys::KEY_BACK ) {		// バックキー
-		sys::SoundManager::set_master_volume(0.5f);
+		play_se(SE_BACK);
+		sys::SoundManager::set_volume(0, 0.7f);
 		open_dialog();
 		dialog_state = TRUE;
 		return	-1;
@@ -194,14 +195,19 @@ int		SceneGame::update(void)
 		}
 		else if ( sys::Renderer::get_bright() == 255 ) {
 			button.update();
-			undo_cnt = button.release - BTN_LEVEL;
-			if ( (undo_cnt >= 0) && (undo_cnt < 4) ) {			// ゲーム開始ボタン
+			level = button.release - BTN_LEVEL;
+			if ( (level >= 0) && (level < 4) ) {				// ゲーム開始ボタン
 				sys::Renderer::fade_out(20);
 				sys::SoundManager::stop(1, 15);					// BGM停止
 				phase++;
 			}
-			else if ( button.release == BTN_APPLI ) {			// 広告呼び出し
-				call_advertisement(0);
+			else if ( button.release == BTN_GAMES ) {			// GooglePlayゲーム
+				sys::SoundManager::set_volume(0, 0.7f);
+				dialog_state = TRUE;
+				open_play_games();
+			}
+			else if ( button.release == BTN_APPLI ) {			// "おすすめアプリ"
+				call_advertisement(ADVERTISEMENT_WALL);
 			}
 		}
 		break;
@@ -209,8 +215,8 @@ int		SceneGame::update(void)
 	  case PHASE_START + 1 :
 		button.update();
 		if ( sys::Renderer::get_bright() == 0 ) {
-			free_mode = (undo_cnt == 3);
-			start_game(undo_cnt);								// ゲーム初期化
+			free_mode = (level == 3);
+			start_game(level);									// ゲーム初期化
 			init_button();										// ボタン初期化
 			sys::SoundManager::play(0, sound_data[BGM_GAME], sound_size[BGM_GAME], 0, 1.0f);			// BGM再生開始
 			sys::Renderer::fade_in(20);
@@ -233,11 +239,6 @@ int		SceneGame::update(void)
 					sys::SoundManager::set_volume(0, 0.7f);
 					phase = PHASE_MENU;
 					break;
-
-				  case BTN_COMIC :
-					call_advertisement(1);
-					break;
-
 				}
 			}
 		}
@@ -245,6 +246,9 @@ int		SceneGame::update(void)
 			if ( clear_cnt < 60 ) {		// クリア状態
 				if ( ++clear_cnt == 20 ) {
 					play_se(SE_CLEAR);
+					if ( flag_answer == 0 ) {
+						unlock_achievement(ACHIEVEMENT_0 + level);
+					}
 				}
 			}
 			else if ( sys::TouchPanel[0].flag & sys::TouchManager::TRIGGER ) {
@@ -270,7 +274,7 @@ int		SceneGame::update(void)
 			break;
 
 		  case BTN_ANSWER :										// "解答表示/非表示"
-			flag_answer = !flag_answer;
+			flag_answer = (flag_answer > 0) ? -1 : 1;
 			break;
 
 		  case BTN_EXIT :										// "ゲーム終了"
@@ -300,11 +304,12 @@ void	SceneGame::init_start(void)
 	static const
 	ButtonManager::ButtonInfo	btn_info[] = 
 	{
-		{BTN_LEVEL + 3,		0, -104, 400,  80,		SPR_BTN_LEVEL + 3},			// "フリーモード"
-		{BTN_LEVEL + 0,		0,  -20, 400,  80,		SPR_BTN_LEVEL + 0},			// "かんたん"
-		{BTN_LEVEL + 1,		0,   60, 400,  80,		SPR_BTN_LEVEL + 1},			// "ふつう"
-		{BTN_LEVEL + 2,		0,  140, 400,  80,		SPR_BTN_LEVEL + 2},			// "むずかしい"
-		{BTN_APPLI,			0,  236, 400,  80,		SPR_BTN_APPLI},				// "おすすめアプリ"
+		{BTN_LEVEL + 3,		   0, -104, 400,  80,		SPR_BTN_LEVEL + 3},			// "フリーモード"
+		{BTN_LEVEL + 0,		   0,  -20, 400,  80,		SPR_BTN_LEVEL + 0},			// "かんたん"
+		{BTN_LEVEL + 1,		   0,   60, 400,  80,		SPR_BTN_LEVEL + 1},			// "ふつう"
+		{BTN_LEVEL + 2,		   0,  140, 400,  80,		SPR_BTN_LEVEL + 2},			// "むずかしい"
+		{BTN_GAMES,			-100,  236, 192,  96,		SPR_BTN_GAMES},				// "Playゲーム"
+		{BTN_APPLI,			 100,  236, 192,  96,		SPR_BTN_APPLI},				// "おすすめアプリ"
 		{-1},
 	};
 
@@ -453,7 +458,7 @@ void	SceneGame::start_game(int _level)
 	move_cnt	= 0;					// 移動カウンタ
 	undo_cnt	= 0;					// やり直しカウンタ
 	clear_cnt	= 0;					// クリアカウンタ
-	flag_answer	= FALSE;;				// 解答表示フラグ
+	flag_answer	= 0;					// 解答表示フラグ
 }
 
 void	SceneGame::restart_game(void)
@@ -488,7 +493,6 @@ void	SceneGame::init_button(void)
 	ButtonManager::ButtonInfo	btn_info[] = 
 	{
 		{BTN_MENU,		  96, -312, 200,  80,		SPR_BTN_MENU},			// "メニュー"
-		{BTN_COMIC,		-144, -328, 160,  80,		SPR_BTN_COMIC},			// 広告まんが
 		{-1},
 	};
 
@@ -741,7 +745,7 @@ void	SceneGame::init_menu(void)
 		{-1},
 	};
 
-	btn_info[2].sprite = flag_answer ? (SPR_BTN_ANSWER + 1) : (SPR_BTN_ANSWER + 0);
+	btn_info[2].sprite = (flag_answer > 0) ? (SPR_BTN_ANSWER + 1) : (SPR_BTN_ANSWER + 0);
 	button.set(btn_info, sprite);			// ボタン設定
 	if ( free_mode ) {
 		button.set_active(1, FALSE);
@@ -843,7 +847,7 @@ void	SceneGame::draw(void)
 		sys::Sprite::set_color();
 
 		// 解答ライン
-		if ( flag_answer ) {
+		if ( flag_answer > 0 ) {
 			for (i = 0; i < FIELD_H + 1; i++) {				// 横ライン
 				for (j = 0; j < FIELD_W; j++) {
 					if ( field[i + 1][j + 1].answer_h ) {

@@ -37,6 +37,7 @@ class SceneGame : public Scene
 	char	back_file[BACK_MAX][32];				// 背景画像ファイル名
 	int		back_num;
 
+	int		level;									// ゲームレベル
 	int		cursor_x, cursor_y;						// カーソル位置
 	int		cursor_dir;								// 移動方向
 	int		cursor_sx, cursor_sy;					// カーソル初期位置
@@ -45,7 +46,7 @@ class SceneGame : public Scene
 	int		undo_cnt;								// やり直しカウンタ
 	int		clear_cnt;								// クリアカウンタ
 	int		menu_cnt;								// メニュー描画カウンタ
-	Bool	flag_answer;							// 解答表示フラグ
+	int		flag_answer;							// 解答表示フラグ
 	Bool	free_mode;								// フリーモード
 
 	Bool	dialog_state;							// 終了確認ダイアログフラグ

@@ -31,6 +31,22 @@ enum
 	SOUND_MAX,
 };
 
+/*** GooglePlayGames実績 *******/
+enum
+{
+	ACHIEVEMENT_0,							// 「かんたん」クリア
+	ACHIEVEMENT_1,							// 「ふつう」クリア
+	ACHIEVEMENT_2,							// 「むずかしい」クリア
+	ACHIEVEMENT_FREE,						// 「フリー」クリア
+	ACHIEVEMENT_MAX,
+};
+
+/*** 広告 *******/
+enum
+{
+	ADVERTISEMENT_WALL	= 0,				// ウォール型
+};
+
 
 /************
     シーン
@@ -71,6 +87,9 @@ public :
 	virtual void	pause(void) {}				// 一時停止
 	virtual void	resume(void) {}				// 再開
 	virtual void	draw(void) {}				// 描画
+
+	void	unlock_achievement(int);			// 実績解除
+	void	open_play_games(void);				// GooglePlayゲームサービス呼び出し
 
 	void	call_advertisement(int);			// 広告呼び出し
 	void	open_dialog(void);					// ダイアログ表示

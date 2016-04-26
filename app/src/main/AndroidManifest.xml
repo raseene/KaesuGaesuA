@@ -1,19 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:tools="http://schemas.android.com/tools"
 	package="jp.so_raseene.kaesu"
-	android:versionCode="5"
-	android:versionName="1.11"
 	android:installLocation="auto" >
 
-	<uses-sdk
-		android:minSdkVersion="9"
-		android:targetSdkVersion="22" />
 	<uses-feature android:glEsVersion="0x00020000"/>
+	<supports-gl-texture android:name="GL_OES_compressed_ETC1_RGB8_texture" />
 
-	<!-- AppC Core Setting Start -->
 	<uses-permission android:name="android.permission.INTERNET" />
 	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-	<!-- AppC Core Setting End -->
+
+	<uses-permission android:name="com.google.android.c2dm.permission.RECEIVE"	tools:node="remove" />
+	<uses-permission android:name="android.permission.WAKE_LOCK"				tools:node="remove" />
+	<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"	tools:node="remove" />
+	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"	tools:node="remove" />
+	<uses-permission android:name="android.permission.GET_ACCOUNTS"				tools:node="remove" />
+	<uses-permission android:name="android.permission.USE_CREDENTIALS"			tools:node="remove" />
+	<uses-permission android:name="android.permission.READ_PHONE_STATE"			tools:node="remove" />
 
 	<application
 		android:allowBackup="true"
@@ -24,6 +27,9 @@
 		<meta-data
 			android:name="com.google.android.gms.version"
 			android:value="@integer/google_play_services_version" />
+		<meta-data
+			android:name="com.google.android.gms.games.APP_ID"
+			android:value="@string/app_id" />
 
 		<activity
 			android:name="app.AppActivity"
@@ -35,49 +41,24 @@
 				<action android:name="android.intent.action.MAIN" />
 				<category android:name="android.intent.category.LAUNCHER" />
 			</intent-filter>
-		</activity>
-
-
-		<!-- AppC Core Setting Start -->
-		<meta-data
-			android:name="appc_media_key"
-			android:value="d10f7b94f16c428aab3462d493472ee6c9c175e3" />
-
-		<activity
-			android:name="net.app_c.cloud.sdk.AppCAdActivity"
-			android:configChanges="fontScale|keyboard|keyboardHidden|locale|mnc|mcc|navigation|orientation|screenLayout|uiMode|touchscreen"
-			android:screenOrientation="portrait"
-			android:theme="@android:style/Theme.NoTitleBar" >
-		</activity>
-		<activity
-			android:name="net.app_c.cloud.sdk.AppCRecoveryActivity"
-			android:configChanges="fontScale|keyboard|keyboardHidden|locale|mnc|mcc|navigation|orientation|screenLayout|uiMode|touchscreen"
-			android:screenOrientation="portrait"
-			android:theme="@android:style/Theme.NoTitleBar" >
-		</activity>
-		<activity
-			android:name="net.app_c.cloud.sdk.AppCAgreementActivity"
-			android:configChanges="fontScale|keyboard|keyboardHidden|locale|mnc|mcc|navigation|orientation|screenLayout|uiMode|touchscreen"
-			android:screenOrientation="portrait"
-			android:theme="@android:style/Theme.NoTitleBar" >
-		</activity>
-		<!-- AppC Core Setting End -->
-
-
-		<!-- AppC Core Setting Start -->
-		<receiver
-			android:name="net.app_c.cloud.sdk.AppCPkgReceiver"
-			android:enabled="true"
-			android:exported="false"
-			android:label="BootStrap" >
 			<intent-filter>
-				<action android:name="android.intent.action.PACKAGE_ADDED" />
-				<data android:scheme="package" >
-				</data>
+				<action android:name="android.intent.action.VIEW"/>
+				<category android:name="android.intent.category.DEFAULT"/>
+				<category android:name="android.intent.category.BROWSABLE"/>
+				<data android:scheme="raseene" android:host="kaesu" />
 			</intent-filter>
-		</receiver>
-		<!-- AppC Core Setting End -->
+		</activity>
 
+
+		<!-- adfurikunWall用 -->
+		<activity
+			android:name="jp.tjkapp.adfurikunsdk.AdfurikunWallAd"
+			android:configChanges="orientation|keyboardHidden|screenSize"
+			android:theme="@android:style/Theme.NoTitleBar" />
+
+		<meta-data
+			android:name="adfurikun_test"
+			android:value="false" />
 
 		</application>
 </manifest>

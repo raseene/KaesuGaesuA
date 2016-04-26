@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:orientation="vertical" android:layout_width="match_parent"
+	android:layout_height="match_parent">
+
+	<Button
+		android:id="@+id/button_sign"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:layout_gravity="center_horizontal"
+		android:text="@string/btn_sign_in"
+		android:textSize="20sp"
+		android:drawableLeft="@drawable/btn_google"
+		android:layout_marginLeft="16dp"
+		android:layout_marginTop="8dp"
+		android:layout_marginRight="16dp"
+		android:layout_marginBottom="8dp"
+		android:paddingTop="4dp"
+		android:paddingBottom="4dp"
+		android:paddingLeft="8dp"
+		android:paddingRight="0dp"
+		android:background="@drawable/shape_button"
+	/>
+
+	<Button
+		android:id="@+id/button_achievement"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:layout_gravity="center_horizontal"
+		android:text="@string/btn_achievement"
+		android:textSize="20sp"
+		android:drawableLeft="@drawable/btn_achievement"
+		android:layout_marginLeft="16dp"
+		android:layout_marginTop="8dp"
+		android:layout_marginRight="16dp"
+		android:layout_marginBottom="8dp"
+		android:paddingTop="4dp"
+		android:paddingBottom="4dp"
+		android:paddingLeft="8dp"
+		android:paddingRight="0dp"
+		android:background="@drawable/shape_button"
+	/>
+
+</LinearLayout>

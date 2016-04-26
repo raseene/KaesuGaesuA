@@ -84,6 +84,42 @@ void	Scene::play_se(int _n)
 }
 
 
+/******************************
+    実績解除
+		引数	_id = 実績ID
+ ******************************/
+void	Scene::unlock_achievement(int _id)
+{
+	assert((_id >= 0) && (_id < ACHIEVEMENT_MAX));
+
+	JAVA_BEGIN()
+	{
+		jmethodID	mid = env->GetStaticMethodID(clazz, "unlock_achievement", "(I)V");
+
+		if ( mid ) {
+			env->CallStaticVoidMethod(clazz, mid,	(jint)_id);
+		}
+	}
+	JAVA_END
+}
+
+/*************************************
+    GooglePlayゲームサービス呼び出し
+ *************************************/
+void	Scene::open_play_games(void)
+{
+	JAVA_BEGIN()
+	{
+		jmethodID	mid = env->GetStaticMethodID(clazz, "open_play_games", "()V");
+
+		if ( mid ) {
+			env->CallStaticVoidMethod(clazz, mid);
+		}
+	}
+	JAVA_END
+}
+
+
 /*******************************************
 	広告呼び出し
 		引数	_type = 0：リストビュー型

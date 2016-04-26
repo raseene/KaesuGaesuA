@@ -15,9 +15,9 @@
 # If your project uses WebView with JS, uncomment the following
 # and specify the fully qualified class name to the JavaScript interface
 # class:
--keepclassmembers class fqcn.of.javascript.interface.for.webview {
-   public *;
-}
+#-keepclassmembers class fqcn.of.javascript.interface.for.webview {
+#   public *;
+#}
 
 -keep public class sys.SoundManager {
 	static public void	set_command(short, short, int, int, short, float);
@@ -25,11 +25,31 @@
 }
 
 -keep public class app.AppActivity {
+	static public void	open_play_games();
+	static public void	unlock_achievement(int);
 	static public void	call_advertisement(int);
 	static public void	open_finish_dialog();
 }
 
--keepattributes JavascriptInterface
--keepclasseswithmembers class * {
-@android.webkit.JavascriptInterface <methods>;
+#GooglePlayGamesService
+-keep class * extends java.util.ListResourceBundle {
+    protected Object[][] getContents();
+}
+
+-keep public class com.google.android.gms.common.internal.safeparcel.SafeParcelable {
+    public static final *** NULL;
+}
+
+-keepnames @com.google.android.gms.common.annotation.KeepName class *
+-keepclassmembernames class * {
+    @ccom.google.android.gms.common.annotation.KeepName *;
+}
+
+-keepnames class * implements android.os.Parcelable {
+    public static final ** CREATOR;
+}
+
+#Adfurikun
+-keep class jp.tjkapp.adfurikunsdk.API_** {
+    public *;
 }

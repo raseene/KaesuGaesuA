@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Google Play game services IDs.
+Save this file as res/values/games-ids.xml in your project.
+-->
+<resources>
+  <string name="app_id">xxxxxxxxxxxx</string>
+  <string name="package_name">jp.so_raseene.kaesu</string>
+  <string name="achievement_free">xxxxxxxxxxxxxxxxxx</string>
+  <string name="achievement_free_10">xxxxxxxxxxxxxxxxxx</string>
+  <string name="achievement_0">xxxxxxxxxxxxxxxxxx</string>
+  <string name="achievement_0_10">xxxxxxxxxxxxxxxxxx</string>
+  <string name="achievement_1">xxxxxxxxxxxxxxxxxx</string>
+  <string name="achievement_1_10">xxxxxxxxxxxxxxxxxx</string>
+  <string name="achievement_2">xxxxxxxxxxxxxxxxxx</string>
+  <string name="achievement_2_10">xxxxxxxxxxxxxxxxxx</string>
+</resources>
