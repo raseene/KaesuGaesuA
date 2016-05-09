@@ -1,7 +1,5 @@
 package sys;
 
-import sys.BaseActivity;
-
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -80,6 +78,16 @@ public class PlayGamesActivity extends BaseActivity implements GameHelper.GameHe
 		}
 	}
 
+	/**************
+	    一時停止
+	 **************/
+	@Override
+	protected void	onPause()
+	{
+		reset_wait();
+		super.onPause();
+	}
+
 
 	/************************************
 	    GooglePlayゲームサービス初期化
@@ -132,6 +140,7 @@ public class PlayGamesActivity extends BaseActivity implements GameHelper.GameHe
 	/****************
 	    サインイン
 	 ****************/
+	synchronized
 	public void		sign_in()
 	{
 		set_wait();
@@ -144,6 +153,7 @@ public class PlayGamesActivity extends BaseActivity implements GameHelper.GameHe
 	/******************
 	    サインアウト
 	 ******************/
+	synchronized
 	public void		sign_out()
 	{
 		if ( mHelper != null ) {
@@ -166,7 +176,9 @@ public class PlayGamesActivity extends BaseActivity implements GameHelper.GameHe
 	private void	reset_wait()
 	{
 		if ( wait_dialog != null ) {
-			wait_dialog.dismiss();
+			if ( wait_dialog.isShowing() ) {
+				wait_dialog.dismiss();
+			}
 			wait_dialog = null;
 		}
 	}

@@ -56,7 +56,9 @@ Bool	update_app(void)
 	}
 	if ( scene ) {
 		scene_kind	= scene->update();				// シーン実行
-		scene->draw();								// 画面描画
+		if ( sys::Renderer::draw_flag ) {
+			scene->draw();							// 画面描画
+		}
 	}
 	return	(scene_kind != SCENE_END);
 }
