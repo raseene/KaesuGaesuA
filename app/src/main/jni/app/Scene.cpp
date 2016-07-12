@@ -15,7 +15,7 @@ u32		Scene::sound_size[SOUND_MAX];		// サウンドデータサイズ
     初期化
 		戻り値	開始シーン番号
  ********************************/
-int		Scene::init(void)
+int		Scene::create(void)
 {
 	static const
 	char*	sound_file[SOUND_MAX] =
@@ -39,7 +39,7 @@ int		Scene::init(void)
 /**********
     終了
  **********/
-void	Scene::quit(void)
+void	Scene::release(void)
 {
 	for (int i = 0; i < SOUND_MAX; i++) {		// サウンド解放
 		free(sound_data[i]);

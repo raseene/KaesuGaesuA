@@ -70,8 +70,8 @@ public :
 	static u32		sound_size[SOUND_MAX];		// サウンドデータサイズ
 	static void		play_se(int);				// SE再生
 
-	static int		init(void);					// 初期化
-	static void		quit(void);					// 終了
+	static int		create(void);				// 初期化
+	static void		release(void);				// 終了
 
 
 	int		phase;					// 実行段階
@@ -96,24 +96,26 @@ public :
 };
 
 
-#define	JAVA_BEGIN(result)																\
-					JNIEnv*		env;													\
-					Bool		attach_flag = FALSE;									\
-																						\
-					if ( sys::g_JavaVM->GetEnv((void**)&env, JNI_VERSION_1_6) < 0 ) {	\
-						if ( sys::g_JavaVM->AttachCurrentThread(&env, NULL) < 0 ) {		\
-							return	result;												\
-						}																\
-						attach_flag = TRUE;												\
-					}																	\
-																						\
-					jclass	clazz = env->FindClass("app/AppActivity");					\
-																						\
-					if ( clazz ) {
+#define	JAVA_BEGIN(result)																	\
+					{																		\
+						JNIEnv*		env;													\
+						Bool		attach_flag = FALSE;									\
+																							\
+						if ( sys::g_JavaVM->GetEnv((void**)&env, JNI_VERSION_1_6) < 0 ) {	\
+							if ( sys::g_JavaVM->AttachCurrentThread(&env, NULL) < 0 ) {		\
+								return	result;												\
+							}																\
+							attach_flag = TRUE;												\
+						}																	\
+																							\
+						jclass	clazz = env->FindClass("app/AppActivity");					\
+																							\
+						if ( clazz ) {
 
-#define	JAVA_END	}																	\
-					if ( attach_flag ) {												\
-						sys::g_JavaVM->DetachCurrentThread();							\
+#define	JAVA_END		}																	\
+						if ( attach_flag ) {												\
+							sys::g_JavaVM->DetachCurrentThread();							\
+						}																	\
 					}
 
 #endif

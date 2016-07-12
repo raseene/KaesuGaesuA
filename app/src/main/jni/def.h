@@ -2,7 +2,7 @@
 #define	___DEF_H___
 
 
-static const int	FRAME_RATE    = 60;						// 1frameの間隔
+static const int	FRAME_RATE    = 60;						// フレームレート
 
 static const int	SCREEN_WIDTH  = 480,					// 画面サイズ
 					SCREEN_HEIGHT = 720;
