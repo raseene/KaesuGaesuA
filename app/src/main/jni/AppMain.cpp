@@ -11,7 +11,7 @@ static int		scene_kind;			// 実行シーン番号
 void	init_app(void)
 {
 	scene		= NULL;
-	scene_kind	= Scene::init();
+	scene_kind	= Scene::create();
 }
 
 /**********
@@ -23,7 +23,7 @@ void	quit_app(void)
 		delete	scene;
 		scene = NULL;
 	}
-	Scene::quit();
+	Scene::release();
 }
 
 
