@@ -320,7 +320,7 @@ public class AppActivity extends PlayGamesActivity
 						app.key_status = KEY_YES;
 					}
 				});
-			builder.setNegativeButton("キャンセル", null);
+//			builder.setNegativeButton("キャンセル", null);
 
 			return	builder.create();
 		}
