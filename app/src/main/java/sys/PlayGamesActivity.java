@@ -41,6 +41,9 @@ public class PlayGamesActivity extends BaseActivity implements GameHelper.GameHe
 		if ( _savedInstanceState == null ) {
 			sign_flag = getApplication().getSharedPreferences("sign_mode", Context.MODE_PRIVATE).getBoolean("mode", true);		// サインイン中か
 		}
+		if ( debug_flag ) {
+			sign_flag = false;
+		}
 		if ( sign_flag ) {
 			init_play_games();							// GooglePlayゲームサービス初期化
 		}

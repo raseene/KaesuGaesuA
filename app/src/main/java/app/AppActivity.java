@@ -37,7 +37,7 @@ public class AppActivity extends PlayGamesActivity
 
 	private AdfurikunLayout		adBanner;						// バナー広告
 	private LinearLayout		adLayout;
-	private AdfurikunLayout		adRect0, adRect1;				// レクタングル広告
+	private AdfurikunLayout		adRect;							// レクタングル広告
 	private static int			ad_wall_cnt = -1;
 
 
@@ -51,42 +51,31 @@ public class AppActivity extends PlayGamesActivity
 		app = this;
 
 
-		adLayout = new LinearLayout(this);								// バナー広告
+		adLayout = new LinearLayout(getApplicationContext());			// バナー広告
 		adLayout.setGravity(Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL);
+		adBanner = new AdfurikunLayout(getApplicationContext());
+		adBanner.setAdfurikunAppKey(BANNER_APPID);
+		adBanner.setTransitionType(AdfurikunLayout.TRANSITION_SLIDE_FROM_BOTTOM);
+		adBanner.startRotateAd();
+		adLayout.addView(adBanner, new LayoutParams(LayoutParams.MATCH_PARENT, getResources().getDimensionPixelSize(R.dimen.ad_height)));
 		base_layout.addView(adLayout);
 
-		adRect0 = new AdfurikunLayout(this);							// レクタングル広告（終了確認ダイアログ）
-		adRect0.setAdfurikunAppKey(RECT_APPID);
 		AdfurikunWallAd.initializeWallAdSetting(this, WALL_APPID);		// ウォール型広告（おすすめアプリ）
 		if ( ad_wall_cnt < 0 ) {
 			ad_wall_cnt = (int)(Math.random()*4);
 		}
 	}
 
-	@Override
-	protected void	onStart()
-	{
-		super.onStart();
-		add_banner();
-	}
-
 	/**********
 	    終了
 	 **********/
 	@Override
-	protected void	onStop()
-	{
-		if ( adBanner != null ) {
-			remove_banner();
-		}
-		super.onStop();
-	}
-
-	@Override
 	protected void	onDestroy()
 	{
-		adRect0.destroy();
-		adRect0 = null;
+		adBanner.destroy();
+		if ( adRect != null ) {
+			adRect.destroy();
+		}
 		AdfurikunWallAd.adfurikunWallAdFinalizeAll();
 
 		super.onDestroy();
@@ -99,13 +88,11 @@ public class AppActivity extends PlayGamesActivity
 	@Override
 	protected void	onPause()
 	{
-		if ( adBanner != null ) {
-			adBanner.onPause();
+		adBanner.onPause();
+		if ( adRect != null ) {
+			adRect.onPause();
 		}
-//		adRect0.onPause();
-		if ( adRect1 != null ) {
-			adRect1.onPause();
-		}
+
 		super.onPause();
 	}
 
@@ -117,12 +104,10 @@ public class AppActivity extends PlayGamesActivity
 	{
 		super.onResume();
 
-		if ( adBanner != null ) {
-			adBanner.onResume();
-		}
-//		adRect0.onResume();
-		if ( adRect1 != null ) {
-			adRect1.onResume();
+		adBanner.onResume();
+		adBanner.nextAd();
+		if ( adRect != null ) {
+			adRect.onResume();
 		}
 	}
 
@@ -271,22 +256,6 @@ public class AppActivity extends PlayGamesActivity
 		}
 	}
 
-	private void	add_banner()
-	{
-		adBanner = new AdfurikunLayout(this);
-		adBanner.setAdfurikunAppKey(BANNER_APPID);
-		adBanner.setTransitionType(AdfurikunLayout.TRANSITION_SLIDE_FROM_BOTTOM);
-		adBanner.startRotateAd();
-		adLayout.addView(adBanner, new LayoutParams(LayoutParams.MATCH_PARENT, getResources().getDimensionPixelSize(R.dimen.ad_height)));
-	}
-
-	private void	remove_banner()
-	{
-		adLayout.removeView(adBanner);
-		adBanner.destroy();
-		adBanner = null;
-	}
-
 
 	/**************
 	    終了確認
@@ -302,13 +271,9 @@ public class AppActivity extends PlayGamesActivity
 		@Override
 		public Dialog	onCreateDialog(Bundle savedInstanceState)
 		{
-			AlertDialog.Builder		builder = new AlertDialog.Builder(getActivity());
+			app.get_rect_ad();
 
-			app.adRect1 = app.adRect0;
-			app.adRect1.setPadding(0, app.screen_height/64, 0, app.screen_height/64);
-			builder.setView(app.adRect1);						// 広告
-			app.adRect0 = new AdfurikunLayout(getActivity());
-			app.adRect0.setAdfurikunAppKey(RECT_APPID);
+			AlertDialog.Builder		builder = new AlertDialog.Builder(getActivity());
 
 			builder.setTitle("アプリ終了確認  －  広告");
 			builder.setPositiveButton("終了",
@@ -322,6 +287,8 @@ public class AppActivity extends PlayGamesActivity
 				});
 //			builder.setNegativeButton("キャンセル", null);
 
+			builder.setView(app.adRect);					// 広告
+
 			return	builder.create();
 		}
 
@@ -330,12 +297,23 @@ public class AppActivity extends PlayGamesActivity
 		{
 			super.onDismiss(dialog);
 
-			app.adRect1.destroy();
-			app.adRect1 = null;
+			app.adRect.destroy();
+			app.adRect = null;
 			if ( app.key_status == 0 ) {
 				app.key_status = KEY_NO;
 			}
 		}
+	}
+
+	public AdfurikunLayout	get_rect_ad()
+	{
+		adRect = new AdfurikunLayout(getApplicationContext());
+		adRect.setAdfurikunAppKey(RECT_APPID);
+		adRect.setPadding(0, screen_height/64, 0, screen_height/64);
+		adRect.startRotateAd();
+		adRect.onResume();
+
+		return	adRect;
 	}
 }
 

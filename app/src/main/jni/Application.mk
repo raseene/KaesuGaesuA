@@ -6,7 +6,7 @@ ifeq ($(APP_OPTIM),debug)
 else
   APP_ABI := armeabi armeabi-v7a
 endif
-APP_PLATFORM := android-10
+APP_PLATFORM := android-15
 APP_STL := gnustl_static
 STLPORT_FORCE_REBUILD := true
 APP_CFLAGS += -Ofast
