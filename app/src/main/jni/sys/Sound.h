@@ -132,12 +132,47 @@ enum
 };
 
 
+/**********************
+    サウンドコマンド
+ **********************/
+struct SoundCommand
+{
+	int				channel;		// チャンネル
+	int				command;		// コマンド
+	const void*		data;			// データ
+	u32				size;			// サイズ
+	int				loop;			// ループ回数
+	float			volume;			// 音量
+
+	void	set(int _channel, int _command, const void* _data, u32 _size, int _loop, float _volume)
+			{
+				channel	= _channel;
+				command	= _command;
+				data	= _data;
+				size	= _size;
+				loop	= _loop;
+				volume	= _volume;
+			}
+};
+
 /******************
     サウンド管理
  ******************/
 class SoundManager
 {
+static const int	QUEUE_SIZE = SOUND_CHANNEL_MAX*4;
+
 	static SoundPlayer*		player;				// プレイヤー
+
+	static pthread_t		thread;				// スレッド
+	static pthread_mutex_t	mutex;
+	static pthread_cond_t	cond;
+	static SoundCommand		queue[QUEUE_SIZE];	// コマンドキュー
+	static int volatile		reserve_pos, run_pos;
+
+	static void		set_command(int, int, const void* _dat = NULL, u32 _size = 0, int _loop = 0, float _volume = 0.0f);
+												// コマンド予約
+	static void*	run(void*);					// コマンド実行スレッド
 
 public :
 
@@ -176,11 +211,6 @@ public :
 					{
 						return	player[_n].get_state();
 					}
-
-	static void		set_command(int, int, const void* _dat = NULL, u32 _size = 0, int _loop = 0, float _volume = 0.0f);
-												// Javaにコマンドを送る
-	static void		get_command(int, int, void*, u32, int, float);
-												// Javaからコマンドを受け取って実行
 };
 
 }

@@ -198,7 +198,7 @@ int		SceneGame::update(void)
 			level = button.release - BTN_LEVEL;
 			if ( (level >= 0) && (level < 4) ) {				// ゲーム開始ボタン
 				sys::Renderer::fade_out(20);
-				sys::SoundManager::stop(1, 15);					// BGM停止
+				sys::SoundManager::stop(0, 15);					// BGM停止
 				phase++;
 			}
 			else if ( button.release == BTN_GAMES ) {			// GooglePlayゲーム
