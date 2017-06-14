@@ -51,14 +51,16 @@ public class AppActivity extends PlayGamesActivity
 		app = this;
 
 
-		adLayout = new LinearLayout(getApplicationContext());			// バナー広告
+		adLayout = new LinearLayout(this);								// バナー広告
 		adLayout.setGravity(Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL);
-		adBanner = new AdfurikunLayout(getApplicationContext());
+		adBanner = new AdfurikunLayout(this);
 		adBanner.setAdfurikunAppKey(BANNER_APPID);
 		adBanner.setTransitionType(AdfurikunLayout.TRANSITION_SLIDE_FROM_BOTTOM);
 		adBanner.startRotateAd();
 		adLayout.addView(adBanner, new LayoutParams(LayoutParams.MATCH_PARENT, getResources().getDimensionPixelSize(R.dimen.ad_height)));
 		base_layout.addView(adLayout);
+
+		get_rect_ad();													// レクタングル広告（終了確認ダイアログ）
 
 		AdfurikunWallAd.initializeWallAdSetting(this, WALL_APPID);		// ウォール型広告（おすすめアプリ）
 		if ( ad_wall_cnt < 0 ) {
@@ -73,11 +75,10 @@ public class AppActivity extends PlayGamesActivity
 	protected void	onDestroy()
 	{
 		adBanner.destroy();
-		if ( adRect != null ) {
-			adRect.destroy();
-		}
+		adRect.destroy();
 		AdfurikunWallAd.adfurikunWallAdFinalizeAll();
 
+		app = null;
 		super.onDestroy();
 	}
 
@@ -89,9 +90,7 @@ public class AppActivity extends PlayGamesActivity
 	protected void	onPause()
 	{
 		adBanner.onPause();
-		if ( adRect != null ) {
-			adRect.onPause();
-		}
+		adRect.onPause();
 
 		super.onPause();
 	}
@@ -106,9 +105,7 @@ public class AppActivity extends PlayGamesActivity
 
 		adBanner.onResume();
 		adBanner.nextAd();
-		if ( adRect != null ) {
-			adRect.onResume();
-		}
+		adRect.onResume();
 	}
 
 
@@ -271,9 +268,9 @@ public class AppActivity extends PlayGamesActivity
 		@Override
 		public Dialog	onCreateDialog(Bundle savedInstanceState)
 		{
-			app.get_rect_ad();
-
 			AlertDialog.Builder		builder = new AlertDialog.Builder(getActivity());
+
+			builder.setView(app.adRect);					// 広告
 
 			builder.setTitle("アプリ終了確認  －  広告");
 			builder.setPositiveButton("終了",
@@ -287,8 +284,6 @@ public class AppActivity extends PlayGamesActivity
 				});
 //			builder.setNegativeButton("キャンセル", null);
 
-			builder.setView(app.adRect);					// 広告
-
 			return	builder.create();
 		}
 
@@ -298,7 +293,7 @@ public class AppActivity extends PlayGamesActivity
 			super.onDismiss(dialog);
 
 			app.adRect.destroy();
-			app.adRect = null;
+			app.get_rect_ad();
 			if ( app.key_status == 0 ) {
 				app.key_status = KEY_NO;
 			}
@@ -307,7 +302,7 @@ public class AppActivity extends PlayGamesActivity
 
 	public AdfurikunLayout	get_rect_ad()
 	{
-		adRect = new AdfurikunLayout(getApplicationContext());
+		adRect = new AdfurikunLayout(this);
 		adRect.setAdfurikunAppKey(RECT_APPID);
 		adRect.setPadding(0, screen_height/64, 0, screen_height/64);
 		adRect.startRotateAd();

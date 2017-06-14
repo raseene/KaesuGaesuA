@@ -637,8 +637,6 @@ enum
 	COMMAND_NEXT,			// 連続再生設定
 	COMMAND_PAUSE,			// 一時停止
 	COMMAND_RESUME,			// 再開
-	COMMAND_PAUSE_SYS,		// システムによる一時停止
-	COMMAND_RESUME_SYS,		// システムによる再開
 	COMMAND_RELEASE,		// 終了
 };
 
@@ -662,6 +660,11 @@ void	SoundManager::create(void)
 	run_pos		= 0;
 	pthread_mutex_init(&mutex, NULL);
 	pthread_cond_init(&cond, NULL);
+	start_thread();
+}
+
+void	SoundManager::start_thread(void)
+{
 	pthread_create(&thread, NULL, run, NULL);			// コマンド実行スレッド
 }
 
@@ -670,8 +673,7 @@ void	SoundManager::create(void)
  **********/
 void	SoundManager::release(void)
 {
-	set_command(-1, COMMAND_RELEASE);					// 終了コマンド
-	pthread_join(thread, NULL);
+	stop_thread();
 	pthread_cond_destroy(&cond);
 	pthread_mutex_destroy(&mutex);
 
@@ -681,7 +683,11 @@ void	SoundManager::release(void)
 	}
 	SoundPlayer::release_engine();						// サウンドエンジン終了
 }
-
+void	SoundManager::stop_thread(void)
+{
+	set_command(-1, COMMAND_RELEASE);					// 終了コマンド
+	pthread_join(thread, NULL);
+}
 
 /*******************************************
     コマンド予約
@@ -793,20 +799,6 @@ void*	SoundManager::run(void*)
 					for (int i = 0; i < SOUND_CHANNEL_MAX; i++) {			// 全て再開
 						player[i].resume();
 					}
-				}
-				break;
-
-			  case COMMAND_PAUSE_SYS :
-				for (int i = 0; i < SOUND_CHANNEL_MAX; i++) {
-					player[i].destroy();
-				}
-				SoundPlayer::release_engine();								// サウンドエンジン終了
-				break;
-
-			  case COMMAND_RESUME_SYS :
-				SoundPlayer::create_engine();								// サウンドエンジン初期化
-				for (int i = 0; i < SOUND_CHANNEL_MAX; i++) {
-					player[i].create();
 				}
 				break;
 
@@ -929,11 +921,6 @@ void	SoundManager::pause(void)
 	set_command(-1, COMMAND_PAUSE);				// 全て一時停止
 }
 
-void	SoundManager::pause_system(void)		// システムによる一時停止
-{
-	set_command(-1, COMMAND_PAUSE_SYS);
-}
-
 /*********************************************
     再開
 		引数	_channel = チャンネル番号
@@ -950,9 +937,28 @@ void	SoundManager::resume(void)
 	set_command(-1, COMMAND_RESUME);			// 全て再開
 }
 
-void	SoundManager::resume_system(void)		// システムによる再開
+/**********************
+    システム一時停止
+ **********************/
+void	SoundManager::pause_system(void)
 {
-	set_command(-1, COMMAND_RESUME_SYS);
+	stop_thread();
+	for (int i = 0; i < SOUND_CHANNEL_MAX; i++) {
+		player[i].destroy();
+	}
+	SoundPlayer::release_engine();				// サウンドエンジン終了
+}
+
+/******************
+    システム再開
+ ******************/
+void	SoundManager::resume_system(void)
+{
+	SoundPlayer::create_engine();				// サウンドエンジン初期化
+	for (int i = 0; i < SOUND_CHANNEL_MAX; i++) {
+		player[i].create();
+	}
+	start_thread();
 }
 
 }
