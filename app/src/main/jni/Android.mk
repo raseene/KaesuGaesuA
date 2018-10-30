@@ -31,7 +31,7 @@ LOCAL_SRC_FILES := \
 	app/Game/Game.cpp \
 	app/Game/Panel.cpp \
 
-LOCAL_LDLIBS    :=  -llog -lGLESv2 -landroid -lz -lOpenSLES
+LOCAL_LDLIBS    := -llog -lGLESv2 -landroid -lz -lOpenSLES
 
 LOCAL_ARM_MODE  := arm
 

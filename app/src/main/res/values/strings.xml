@@ -2,9 +2,16 @@
 <resources>
 
     <string name="app_name">かえすがえす</string>
-    <string name="play_games_dialog"> Google Play ゲーム</string>
-    <string name="btn_sign_in">サインイン　</string>
-    <string name="btn_sign_out">サインアウト　</string>
-    <string name="btn_achievement">　　　実績　　　　</string>
+    <string name="privacy_policy">"<u>プライバシーポリシー</u>"</string>
+
+    <string name="apps_title">「かえすがえす」からのおすすめ</string>
+    <string name="close">✖</string>
+    <string name="pr">PR</string>
+
+    <string name="play_games_dialog">Google Play ゲーム</string>
+    <string name="btn_sign_in">サインイン</string>
+    <string name="btn_sign_out">サインアウト</string>
+    <string name="btn_connecting">接続中...</string>
+    <string name="btn_achievement">実績</string>
 
 </resources>

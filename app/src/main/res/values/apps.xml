@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+	<array name="apps_info">
+		<item>@array/apps0</item>
+		<item>@array/apps1</item>
+		<item>@array/apps2</item>
+		<item>@array/apps3</item>
+		<item>@array/apps4</item>
+		<item>@array/apps5</item>
+		<item>@array/apps6</item>
+		<item>@array/apps7</item>
+		<item>@array/apps8</item>
+		<item>@array/apps9</item>
+		<item>@array/apps10</item>
+	</array>
+	<array name="apps_image">
+		<item>@drawable/apps0</item>
+		<item>@drawable/apps1</item>
+		<item>@drawable/apps2</item>
+		<item>@drawable/apps3</item>
+		<item>@drawable/apps4</item>
+		<item>@drawable/apps5</item>
+		<item>@drawable/apps6</item>
+		<item>@drawable/apps7</item>
+		<item>@drawable/apps8</item>
+		<item>@drawable/apps9</item>
+		<item>@drawable/apps10</item>
+	</array>
+	<string-array name="apps0">
+		<item>初音演歌 - 初音ミクが即興で唄う演歌</item>
+		<item>日本人の心、演歌を初音ミクがしっとりと歌い上げます。果たしてどんな歌詞が飛び出すか、聞いてみてのお楽しみ。</item>
+		<item>hatsune_enka</item>
+	</string-array>
+	<string-array name="apps1">
+		<item>くるくるアクションパズル くるんくる～ぱ</item>
+		<item>くるくる回して、ぱ～っと消す！簡単なルールで５色の球を消しまくる、爽快なアクションパズルゲームです。</item>
+		<item>kurunku</item>
+	</string-array>
+	<string-array name="apps2">
+		<item>ひっくり返しパズル かえすがえす</item>
+		<item>簡単なルールで、お手軽なパズル。パネルをひっくり返して、猫の画像を完成させましょう。</item>
+		<item>kaesu</item>
+	</string-array>
+	<string-array name="apps3">
+		<item>3Dドライブ Plain Speed</item>
+		<item>都会のハイウェイ……っぽい所や、切り立つ崖に挟まれた山道……のような所、広々とした草原の中の田舎道……みたいな所を駆け抜けよう！</item>
+		<item>speed</item>
+	</string-array>
+	<string-array name="apps4">
+		<item>脳トレパズル 一撃！Hit＆Blow</item>
+		<item>得られた情報から推理して、ただ一つの答えを導きピタリと言い当てる！そんなヒット＆ブローの醍醐味だけを抜き出したパズルです。</item>
+		<item>hitblow</item>
+	</string-array>
+	<string-array name="apps5">
+		<item>反射パズル ISHIKARI（いしかり）</item>
+		<item>光を導いて、宝石を狩る。シンプルなルールで奥が深い、ステージクリア型のパズルです。</item>
+		<item>ishikari</item>
+	</string-array>
+	<string-array name="apps6">
+		<item>難易度いろいろ 変則スライドパズル</item>
+		<item>15パズルに代表される、スライドパズル。そんな誰でも知っているパズルに「動かせないブロック」があるだけで、難易度いろいろ！</item>
+		<item>slidepuzzle</item>
+	</string-array>
+	<string-array name="apps7">
+		<item>顔で遊ぼう！ おかしな（ヵ_ォ）カメラ</item>
+		<item>顔の映像をリアルタイムに加工してしまう、面白カメラアプリ。顔を拡大したり残像を残したりと、いろいろなエフェクトが揃っています。</item>
+		<item>facecamera</item>
+	</string-array>
+	<string-array name="apps8">
+		<item>不思議なエフェクト おかしなカメラ・改</item>
+		<item>カメラからの入力映像をリアルタイムに加工して表示する、面白カメラアプリ。ちょっと不思議なエフェクトが、いろいろ揃っています。</item>
+		<item>camera2</item>
+	</string-array>
+	<string-array name="apps9">
+		<item>お前だ！ ～ 顔が浮かび上がる いたずらアプリ</item>
+		<item>いつものスマホの画面に浮かび上がる\nその顔は……</item>
+		<item>yourface</item>
+	</string-array>
+	<string-array name="apps10">
+		<item>落下アクション おちてく</item>
+		<item>とことん落ちてく、ひたすら落ちてく。球を素早く下に落とすだけの、ルールも操作もシンプルなアクションゲーム！</item>
+		<item>ochitech</item>
+	</string-array>
+
+</resources>

@@ -31,11 +31,12 @@ void	quit_app(void)
 #include	"scene_kind.h"
 #undef	SCENE_KIND
 
-/******************************
+/************************************
     稼働
+		引数	_draw = 描画フラグ
 		戻り値	アプリ続行か
- ******************************/
-Bool	update_app(void)
+ ************************************/
+Bool	update_app(Bool _draw)
 {
 	if ( scene_kind >= 0 ) {						// シーン開始
 		if ( scene ) {
@@ -43,6 +44,8 @@ Bool	update_app(void)
 			scene = NULL;
 		}
 		switch ( scene_kind ) {
+		  case SCENE_END :							// 終了
+			return	FALSE;
 
 #define	SCENE_KIND(name, func)	case name :\
 									scene = func();\
@@ -52,13 +55,13 @@ Bool	update_app(void)
 #undef	SCENE_KIND
 
 		}
+		assert(scene);
+		scene->resume();
 		scene_kind	= -1;
 	}
-	if ( scene ) {
-		scene_kind	= scene->update();				// シーン実行
-		if ( sys::Renderer::draw_flag ) {
-			scene->draw();							// 画面描画
-		}
+	scene_kind	= scene->update();					// シーン実行
+	if ( _draw ) {
+		scene->draw();								// 画面描画
 	}
 	return	(scene_kind != SCENE_END);
 }

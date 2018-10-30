@@ -8,6 +8,9 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
+import android.content.res.TypedArray;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
@@ -15,10 +18,16 @@ import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+import java.util.List;
 
-import jp.tjkapp.adfurikunsdk.AdfurikunLayout;
-import jp.tjkapp.adfurikunsdk.AdfurikunWallAd;
+import net.nend.android.NendAdView;
+import net.nend.android.NendAdNative;
+import net.nend.android.NendAdNativeClient;
+import net.nend.android.NendAdNativeViewBinder;
 
 
 /********************
@@ -27,18 +36,22 @@ import jp.tjkapp.adfurikunsdk.AdfurikunWallAd;
 public class AppActivity extends PlayGamesActivity
 {
 	public static AppActivity	app;
+	private LinearLayout		text_privacy;					// プライバシーポリシー
 
-	private	PlayGamesDialogFragment	dialog_play_games;		// GooglePlayゲームサービスダイアログ
+	private PlayGamesDialogFragment		dialog_play_games;		// GooglePlayゲームサービスダイアログ
 
 
-	private static final String		BANNER_APPID = "xxxxxxxxxxxxxxxxxxxxxxxx";			// バナー広告ID
-	private static final String		RECT_APPID   = "xxxxxxxxxxxxxxxxxxxxxxxx";			// レクタングル広告ID
-	private static final String		WALL_APPID   = "xxxxxxxxxxxxxxxxxxxxxxxx";			// ウォール型広告ID
+	private static final int		BANNER_ID  = 169680;		// バナー広告
+	private static final String		BANNER_KEY = "b3d755d4ade4a859b7d2b4be25353ed4b1758200";
+	private static final int		RECT_ID    = 912238;		// レクタングル広告
+	private static final String		RECT_KEY   = "6645ce4345defb89cd321d6b5deb31f5071923f3";
+	private static final int		NATIVE_ID  = 912240;		// ネイティブ広告
+	private static final String		NATIVE_KEY = "822cf2731abaef954f8b6c581430f0a0dbb4d6fb";
 
-	private AdfurikunLayout		adBanner;						// バナー広告
-	private LinearLayout		adLayout;
-	private AdfurikunLayout		adRect;							// レクタングル広告
-	private static int			ad_wall_cnt = -1;
+	private NendAdView		adBanner, adRect;					// バナー広告、レクタングル広告
+	private LinearLayout	adLayout0, adLayout1;
+	private boolean			ad_flag = true;
+	private LinearLayout	apps_page;							// おすすめ画面
 
 
 	/**********
@@ -50,22 +63,24 @@ public class AppActivity extends PlayGamesActivity
 		super.onCreate2(_savedInstanceState, BuildConfig.DEBUG);
 		app = this;
 
+		text_privacy = (LinearLayout)getLayoutInflater().inflate(R.layout.privacy_policy, null);		// プライバシーポリシー
+		text_privacy.findViewById(R.id.text).setOnClickListener(new View.OnClickListener()
+		{
+			@Override
+			public void		onClick(View v)
+			{
+				startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://raseene.asablo.jp/blog/2018/09/24/8964609")));
+			}
+		});
+		set_privacy_polycy(true);
 
-		adLayout = new LinearLayout(this);								// バナー広告
-		adLayout.setGravity(Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL);
-		adBanner = new AdfurikunLayout(this);
-		adBanner.setAdfurikunAppKey(BANNER_APPID);
-		adBanner.setTransitionType(AdfurikunLayout.TRANSITION_SLIDE_FROM_BOTTOM);
-		adBanner.startRotateAd();
-		adLayout.addView(adBanner, new LayoutParams(LayoutParams.MATCH_PARENT, getResources().getDimensionPixelSize(R.dimen.ad_height)));
-		base_layout.addView(adLayout);
 
-		get_rect_ad();													// レクタングル広告（終了確認ダイアログ）
+		adBanner = new NendAdView(getApplicationContext(), BANNER_ID, BANNER_KEY, true);
+		adBanner.loadAd();
+		add_banner();											// バナー広告
 
-		AdfurikunWallAd.initializeWallAdSetting(this, WALL_APPID);		// ウォール型広告（おすすめアプリ）
-		if ( ad_wall_cnt < 0 ) {
-			ad_wall_cnt = (int)(Math.random()*4);
-		}
+		adRect = new NendAdView(getApplicationContext(), RECT_ID, RECT_KEY, true);
+		adRect.loadAd();										// レクタングル広告（終了確認ダイアログ）
 	}
 
 	/**********
@@ -74,14 +89,9 @@ public class AppActivity extends PlayGamesActivity
 	@Override
 	protected void	onDestroy()
 	{
-		adBanner.destroy();
-		adRect.destroy();
-		AdfurikunWallAd.adfurikunWallAdFinalizeAll();
-
-		app = null;
 		super.onDestroy();
+		app = null;
 	}
-
 
 	/**************
 	    一時停止
@@ -89,23 +99,8 @@ public class AppActivity extends PlayGamesActivity
 	@Override
 	protected void	onPause()
 	{
-		adBanner.onPause();
-		adRect.onPause();
-
+		adBanner.loadAd();
 		super.onPause();
-	}
-
-	/**********
-	    再開
-	 **********/
-	@Override
-	protected void	onResume()
-	{
-		super.onResume();
-
-		adBanner.onResume();
-		adBanner.nextAd();
-		adRect.onResume();
 	}
 
 
@@ -115,14 +110,8 @@ public class AppActivity extends PlayGamesActivity
 	static
 	public void		open_play_games()
 	{
-		app._open_play_games();
-	}
-
-	public void		_open_play_games()
-	{
-		dialog_play_games = new PlayGamesDialogFragment();				// GooglePlayゲームサービスダイアログ
-		dialog_play_games.set_mode((mHelper != null) && mHelper.isSignedIn());
-		dialog_play_games.show(getSupportFragmentManager(), "dialog");
+		app.dialog_play_games = new PlayGamesDialogFragment();				// GooglePlayゲームサービスダイアログ
+		app.dialog_play_games.show(app.getSupportFragmentManager(), "dialog");
 	}
 
 	/******************************
@@ -130,7 +119,6 @@ public class AppActivity extends PlayGamesActivity
 	 ******************************/
 	public static class PlayGamesDialogFragment extends DialogFragment
 	{
-		private boolean		mode = false;
 		private Button[]	button = new Button[2];
 
 		@Override
@@ -140,35 +128,34 @@ public class AppActivity extends PlayGamesActivity
 
 			builder.setTitle(R.string.play_games_dialog);
 			builder.setIcon(R.drawable.controller);
-//			builder.setPositiveButton("OK", null);
 
 			LinearLayout	_layout = (LinearLayout)app.getLayoutInflater().inflate(R.layout.play_games_dialog, null);
 
-			button[0] = (Button)_layout.findViewById(R.id.button_sign);
+			button[0] = _layout.findViewById(R.id.button_sign);
 			button[0].setOnClickListener(new View.OnClickListener()
 			{
 				public void		onClick(View v)
 				{
-					if ( mode ) {					// サインアウト
-						app.sign_out();
-						set_mode(false);
+					if ( app.mHelper.isSignedIn() ) {			// サインアウト
+						app.mHelper.signOut();
 					}
-					else {							// サインイン
-						app.sign_in();
+					else {										// サインイン
+						app.mHelper.beginUserInitiatedSignIn();
 					}
+					set_button();
 				}
 			});
 
-			button[1] = (Button)_layout.findViewById(R.id.button_achievement);
+			button[1] = _layout.findViewById(R.id.button_achievement);
 			button[1].setOnClickListener(new View.OnClickListener()
 			{
 				public void		onClick(View v)
 				{
-					app.show_achievement();			// 実績
+					app.show_achievement();						// 実績
 				}
 			});
 
-			set_mode(mode);
+			set_button();
 			builder.setView(_layout);
 
 			return	builder.create();
@@ -181,16 +168,28 @@ public class AppActivity extends PlayGamesActivity
 			app.key_status = KEY_NO;
 		}
 
-		/*******************************
-		    サインイン/アウト切り替え
-		 *******************************/
-		public void		set_mode(boolean _f)
+		/****************
+		    ボタン設定
+		 ****************/
+		public void		set_button()
 		{
-			mode = _f;
-			if ( button[0] != null ) {
-				button[0].setText(_f ? R.string.btn_sign_out : R.string.btn_sign_in);
+			if ( app.mHelper.isConnecting() ) {					// 接続中
+				button[0].setText(R.string.btn_connecting);
+				for (int i = 0; i < button.length; i++) {
+					button[i].setEnabled(false);
+				}
+			}
+			else if ( app.mHelper.isSignedIn() ) {				// サインイン状態
+				button[0].setText(R.string.btn_sign_out);
+				for (int i = 0; i < button.length; i++) {
+					button[i].setEnabled(true);
+				}
+			}
+			else {												// サインアウト状態
+				button[0].setText(R.string.btn_sign_in);
+				button[0].setEnabled(true);
 				for (int i = 1; i < button.length; i++) {
-					button[i].setEnabled(_f);
+					button[i].setEnabled(false);
 				}
 			}
 		}
@@ -203,9 +202,18 @@ public class AppActivity extends PlayGamesActivity
 	public void		onSignInSucceeded()
 	{
 		if ( dialog_play_games != null ) {
-			dialog_play_games.set_mode(true);			// ダイアログ切り替え
+			dialog_play_games.set_button();				// ダイアログ切り替え
 		}
 		super.onSignInSucceeded();
+	}
+
+	@Override
+	public void		onSignInFailed()
+	{
+		if ( dialog_play_games != null ) {
+			dialog_play_games.set_button();				// ダイアログ切り替え
+		}
+		super.onSignInFailed();
 	}
 
 	/****************************
@@ -228,10 +236,27 @@ public class AppActivity extends PlayGamesActivity
 	}
 
 
-	/***************************************
+	/**************************
+	    プライバシーポリシー
+	 **************************/
+	public void		set_privacy_polycy(boolean _f)
+	{
+		if ( _f ) {
+			base_layout.addView(text_privacy, 1);
+		}
+		else {
+			base_layout.removeView(text_privacy);
+		}
+	}
+
+
+	/********************************************************
 		広告呼び出し
-			引数	_type = 0：ウォール型
-	 ***************************************/
+			引数	_type = 10：ウォール型表示
+					      = 11：ウォール型非表示
+						  = 20：プライバシーポリシー表示
+						  = 21：プライバシーポリシー非表示
+	 ********************************************************/
 	static
 	public void		call_advertisement(int _type)
 	{
@@ -241,16 +266,75 @@ public class AppActivity extends PlayGamesActivity
 	public void		_call_advertisement(int _type)
 	{
 		switch ( _type ) {
-		  case 0 :						// ウォール型
-			if ( ad_wall_cnt == 0 ) {
-				app.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/dev?id=8263025394163231637")));
-			}
-			else {
-				AdfurikunWallAd.showWallAd(this, null);
-			}
-			ad_wall_cnt = ++ad_wall_cnt % 4;
+		  case 10 :						// ウォール型表示
+			init_apps_page();
+			runOnUiThread(new Runnable()
+			{
+				public
+				void	run()
+				{
+					remove_banner();
+					set_privacy_polycy(false);
+					base_layout.addView(apps_page, 1);
+				}
+			});
+			break;
+
+		  case 11 :						// ウォール型非表示
+			runOnUiThread(new Runnable()
+			{
+				public
+				void	run()
+				{
+					base_layout.removeView(apps_page);
+					apps_page = null;
+					set_privacy_polycy(true);
+					add_banner();
+				}
+			});
+			break;
+
+
+		  case 20 :						// プライバシーポリシー表示
+			runOnUiThread(new Runnable()
+			{
+				public
+				void	run()
+				{
+					set_privacy_polycy(true);
+				}
+			});
+			break;
+
+		  case 21 :						// プライバシーポリシー非表示
+			runOnUiThread(new Runnable()
+			{
+				public
+				void	run()
+				{
+					set_privacy_polycy(false);
+				}
+			});
 			break;
 		}
+	}
+
+	private void	add_banner()
+	{
+		adLayout0 = new LinearLayout(this);
+		adLayout0.setGravity(Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL);
+		adLayout0.addView(adBanner, new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
+		base_layout.addView(adLayout0, 1);
+		ad_flag = true;
+	}
+
+	private void	remove_banner()
+	{
+		adLayout0.removeView(adBanner);
+		base_layout.removeView(adLayout0);
+		adLayout0 = null;
+		adBanner.loadAd();
+		ad_flag = false;
 	}
 
 
@@ -270,7 +354,11 @@ public class AppActivity extends PlayGamesActivity
 		{
 			AlertDialog.Builder		builder = new AlertDialog.Builder(getActivity());
 
-			builder.setView(app.adRect);					// 広告
+			app.adLayout1 = new LinearLayout(getActivity());
+			app.adLayout1.addView(app.adRect, new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
+			app.adLayout1.setGravity(Gravity.CENTER_VERTICAL | Gravity.CENTER_HORIZONTAL);
+			app.adLayout1.setPadding(app.screen_height/32, 0, app.screen_height/32, app.screen_height/64);
+			builder.setView(app.adLayout1);							// 広告
 
 			builder.setTitle("アプリ終了確認  －  広告");
 			builder.setPositiveButton("終了",
@@ -282,7 +370,6 @@ public class AppActivity extends PlayGamesActivity
 						app.key_status = KEY_YES;
 					}
 				});
-//			builder.setNegativeButton("キャンセル", null);
 
 			return	builder.create();
 		}
@@ -292,23 +379,130 @@ public class AppActivity extends PlayGamesActivity
 		{
 			super.onDismiss(dialog);
 
-			app.adRect.destroy();
-			app.get_rect_ad();
+			app.adLayout1.removeView(app.adRect);
+			app.adLayout1 = null;
+			app.adRect.loadAd();
 			if ( app.key_status == 0 ) {
 				app.key_status = KEY_NO;
 			}
 		}
 	}
 
-	public AdfurikunLayout	get_rect_ad()
-	{
-		adRect = new AdfurikunLayout(this);
-		adRect.setAdfurikunAppKey(RECT_APPID);
-		adRect.setPadding(0, screen_height/64, 0, screen_height/64);
-		adRect.startRotateAd();
-		adRect.onResume();
 
-		return	adRect;
+	/************************
+	    おすすめ画面初期化
+	 ************************/
+	private void	init_apps_page()
+	{
+		final int	ITEM_MAX = 8;						// 表示アプリ数
+
+
+		TypedArray	apps_info = getResources().obtainTypedArray(R.array.apps_info),				// 自作アプリ情報
+					apps_image = getResources().obtainTypedArray(R.array.apps_image);
+		List<ApplicationInfo>	inst_list = getPackageManager().getInstalledApplications(PackageManager.GET_META_DATA);
+																								// インストール済みアプリ名
+		int		num = apps_info.length(),														// 自作アプリ数
+				i, j, t;
+		int[]	list = new int[(num < ITEM_MAX) ? ITEM_MAX : num];
+
+		for (i = 0; i < num; i++) {
+			list[i] = i;
+		}
+		for (i = 0; i < num; i++) {						// シャッフル
+			j = (int)(Math.random()*num);
+			t = list[i];
+			list[i] = list[j];
+			list[j] = t;
+		}
+		for (i = num - 1; i >= 0; i--) {				// インストールチェック
+			String	_name = "jp.so_raseene." + getResources().getStringArray(apps_info.getResourceId(list[i], 0))[2];
+
+			for (ApplicationInfo _list : inst_list) {
+				if ( _name.equals(_list.processName) ) {			// インストール済み
+					t = list[i];
+					for (j = i; j < num - 1; j++) {
+						list[j] = list[j + 1];
+					}
+					list[j] = t;
+					break;
+				}
+			}
+		}
+		for (i = 3; i < ITEM_MAX; i++) {				// ネイティブ広告
+			list[i] = -1;
+		}
+		for (i = 0; i < ITEM_MAX; i++) {				// シャッフル
+			j = (int)(Math.random()*ITEM_MAX);
+			t = list[i];
+			list[i] = list[j];
+			list[j] = t;
+		}
+
+
+		apps_page = (LinearLayout)getLayoutInflater().inflate(R.layout.apps_page, null);		// おすすめ画面
+		apps_page.findViewById(R.id.close).setOnClickListener(new View.OnClickListener()		// クローズボタン
+		{
+			@Override
+			public void		onClick(View v)
+			{
+				app.key_status = KEY_BACK;
+			}
+		});
+
+
+		final LinearLayout	apps_list = apps_page.findViewById(R.id.apps_list);					// 項目追加レイアウト
+
+		NendAdNativeClient				client = new NendAdNativeClient(this, NATIVE_ID, NATIVE_KEY);
+		final NendAdNativeViewBinder	binder = new NendAdNativeViewBinder.Builder()
+														.adImageId(R.id.ad_image)
+														.titleId(R.id.ad_promotion_name)
+														.contentId(R.id.ad_content)
+														.prId(R.id.ad_pr, NendAdNative.AdvertisingExplicitly.PR)
+														.build();
+
+		for (i = 0; i < ITEM_MAX; i++) {
+			final RelativeLayout	item = (RelativeLayout)getLayoutInflater().inflate(R.layout.apps_item, null);
+
+			apps_list.addView(item);					// 項目追加
+
+			if ( list[i] < 0 ) {						// ネイティブ広告
+				client.loadAd(new NendAdNativeClient.Callback()
+				{
+					@Override
+					public void		onSuccess(final NendAdNative nendAdNative)
+					{
+						nendAdNative.intoView(item.findViewById(R.id.ad), binder);
+					}
+
+					@Override
+					public void		onFailure(NendAdNativeClient.NendError nendError)
+					{
+						apps_list.removeView(item);
+					}
+				});
+			}
+			else {										// 自作アプリ
+				String[]	str = getResources().getStringArray(apps_info.getResourceId(list[i], 0));
+
+				((ImageView)item.findViewById(R.id.ad_image)).setImageResource(apps_image.getResourceId(list[i], 0));	// アイコン画像
+				((TextView)item.findViewById(R.id.ad_pr)).setText(R.string.pr);											// PRマーク
+				((TextView)item.findViewById(R.id.ad_promotion_name)).setText(str[0]);									// アプリ名
+				((TextView)item.findViewById(R.id.ad_content)).setText(str[1]);											// アプリ説明
+
+				final String	url = "http://market.android.com/details?id=jp.so_raseene." + str[2];					// ストアURL
+
+				item.setOnClickListener(new View.OnClickListener()
+				{
+					@Override
+					public void		onClick(View v)
+					{
+						startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));									// ストアに飛ぶ
+					}
+				});
+			}
+		}
+		apps_info.recycle();
+		apps_image.recycle();
 	}
 }
 

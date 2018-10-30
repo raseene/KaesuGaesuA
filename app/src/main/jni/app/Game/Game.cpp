@@ -140,10 +140,11 @@ SceneGame::SceneGame(void)
 	back_num = -1;
 
 	dialog_state = FALSE;								// 終了確認ダイアログフラグ
+	recommend_state = FALSE;							// おすすめアプリ表示フラグ
 
 	start_game(-1);										// パネル初期化
 	init_start();										// 開始メニュー初期化
-	sys::SoundManager::play(0, sound_data[BGM_MENU], sound_size[BGM_MENU], 0, 1.0f);			// BGM再生開始
+	sys::SoundManager::play(0, "sound/bgm_menu.ogg", 0);		// BGM再生開始
 	sys::Renderer::fade_in();
 	clear_cnt = -1;
 	menu_cnt  = 8;
@@ -164,7 +165,16 @@ SceneGame::~SceneGame(void)
  ************/
 int		SceneGame::update(void)
 {
-	if ( dialog_state ) {				// ダイアログ表示中
+	if ( recommend_state ) {			// おすすめアプリ表示中
+		if ( sys::key_status == sys::KEY_BACK ) {
+			play_se(SE_BACK);
+			call_advertisement(ADVERTISEMENT_WALL + 1);
+			sys::SoundManager::set_volume(0, 1.0f);
+			recommend_state = FALSE;
+		}
+		return	-1;
+	}
+	else if ( dialog_state ) {			// ダイアログ表示中
 		switch ( sys::key_status ) {
 		  case sys::KEY_YES :							// アプリ終了
 			sys::SoundManager::stop();
@@ -197,6 +207,7 @@ int		SceneGame::update(void)
 			button.update();
 			level = button.release - BTN_LEVEL;
 			if ( (level >= 0) && (level < 4) ) {				// ゲーム開始ボタン
+				call_advertisement(PRIVACY_POLYCY_OFF);
 				sys::Renderer::fade_out(20);
 				sys::SoundManager::stop(0, 15);					// BGM停止
 				phase++;
@@ -207,7 +218,9 @@ int		SceneGame::update(void)
 				open_play_games();
 			}
 			else if ( button.release == BTN_APPLI ) {			// "おすすめアプリ"
-				call_advertisement(ADVERTISEMENT_WALL);
+				sys::SoundManager::set_volume(0, 0.7f);
+				call_advertisement(ADVERTISEMENT_WALL + 0);
+				recommend_state = TRUE;
 			}
 		}
 		break;
@@ -218,7 +231,7 @@ int		SceneGame::update(void)
 			free_mode = (level == 3);
 			start_game(level);									// ゲーム初期化
 			init_button();										// ボタン初期化
-			sys::SoundManager::play(0, sound_data[BGM_GAME], sound_size[BGM_GAME], 0, 1.0f);			// BGM再生開始
+			sys::SoundManager::play(0, "sound/bgm_game.ogg", 0);		// BGM再生開始
 			sys::Renderer::fade_in(20);
 			phase = PHASE_GAME;
 		}
@@ -253,11 +266,12 @@ int		SceneGame::update(void)
 			}
 			else if ( sys::TouchPanel[0].flag & sys::TouchManager::TRIGGER ) {
 				play_se(SE_CLICK);
-				sys::SoundManager::play(0, sound_data[BGM_MENU], sound_size[BGM_MENU], 0, 1.0f);			// BGM再生開始
+				sys::SoundManager::play(0, "sound/bgm_menu.ogg", 0);		// BGM再生開始
 				menu_cnt = 0;
 			}
 			else if ( (menu_cnt == 0) && (sys::TouchPanel[0].flag & sys::TouchManager::RELEASE) ) {
 				init_start();									// 開始メニュー初期化
+				call_advertisement(PRIVACY_POLYCY_ON);
 				phase = PHASE_START;
 			}
 		}
@@ -280,7 +294,8 @@ int		SceneGame::update(void)
 		  case BTN_EXIT :										// "ゲーム終了"
 			init_start();										// 開始メニュー初期化
 			menu_cnt = 0;
-			sys::SoundManager::play(0, sound_data[BGM_MENU], sound_size[BGM_MENU], 0, 1.0f);			// BGM再生開始
+			sys::SoundManager::play(0, "sound/bgm_menu.ogg", 0);		// BGM再生開始
+			call_advertisement(PRIVACY_POLYCY_ON);
 			phase = PHASE_START;
 			return	-1;
 
@@ -492,7 +507,7 @@ void	SceneGame::init_button(void)
 	static const
 	ButtonManager::ButtonInfo	btn_info[] = 
 	{
-		{BTN_MENU,		  96, -312, 200,  80,		SPR_BTN_MENU},			// "メニュー"
+		{BTN_MENU,		-120, -312, 200,  80,		SPR_BTN_MENU},			// "メニュー"
 		{-1},
 	};
 
@@ -777,6 +792,9 @@ void	SceneGame::draw(void)
 		for (j = 0; j < FIELD_W; j++) {
 			panel[i][j].draw(_t);
 		}
+	}
+	if ( recommend_state ) {
+		return;
 	}
 
 	// 軌跡ライン

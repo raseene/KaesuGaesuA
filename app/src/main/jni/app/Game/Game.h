@@ -50,6 +50,7 @@ class SceneGame : public Scene
 	Bool	free_mode;								// フリーモード
 
 	Bool	dialog_state;							// 終了確認ダイアログフラグ
+	Bool	recommend_state;						// おすすめアプリ表示フラグ
 
 	void	init_start(void);			// 開始メニュー初期化
 	void	start_game(int);			// 新規ゲーム開始

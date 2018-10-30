@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-	xmlns:tools="http://schemas.android.com/tools"
+<manifest
+	xmlns:android="http://schemas.android.com/apk/res/android"
 	package="jp.so_raseene.kaesu"
 	android:installLocation="auto" >
 
@@ -40,17 +40,5 @@
 				<data android:scheme="raseene" android:host="kaesu" />
 			</intent-filter>
 		</activity>
-
-
-		<!-- adfurikunWall用 -->
-		<activity
-			android:name="jp.tjkapp.adfurikunsdk.AdfurikunWallAd"
-			android:configChanges="orientation|keyboardHidden|screenSize"
-			android:theme="@android:style/Theme.NoTitleBar" />
-
-		<meta-data
-			android:name="adfurikun_test"
-			android:value="false" />
-
-		</application>
+	</application>
 </manifest>

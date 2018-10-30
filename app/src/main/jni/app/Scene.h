@@ -13,7 +13,7 @@
 enum
 {
 #include	"scene_kind.h"
-	SCENE_MAX
+	SCENE_END,
 };
 #undef	SCENE_KIND
 
@@ -21,8 +21,6 @@ enum
 /*** サウンドデータ *******/
 enum
 {
-	BGM_GAME,
-	BGM_MENU,
 	SE_CLICK,
 	SE_FORWARD,
 	SE_BACK,
@@ -44,7 +42,9 @@ enum
 /*** 広告 *******/
 enum
 {
-	ADVERTISEMENT_WALL	= 0,				// ウォール型
+	ADVERTISEMENT_WALL	= 10,				// ウォール型
+	PRIVACY_POLYCY_ON	= 20,				// プライバシーポリシー表示
+	PRIVACY_POLYCY_OFF,						// プライバシーポリシー非表示
 };
 
 

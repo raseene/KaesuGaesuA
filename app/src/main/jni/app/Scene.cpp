@@ -4,7 +4,7 @@
 
  *****************************/
 
-#include	"Scene.h"
+#include "Scene.h"
 
 
 void*	Scene::sound_data[SOUND_MAX];		// サウンドデータ
@@ -20,8 +20,6 @@ int		Scene::create(void)
 	static const
 	char*	sound_file[SOUND_MAX] =
 			{
-				"sound/bgm_game.ogg",
-				"sound/bgm_menu.ogg",
 				"sound/se_click.ogg",
 				"sound/se_forward.ogg",
 				"sound/se_back.ogg",
@@ -79,8 +77,8 @@ void	Scene::play_se(int _n)
 {
 	static int	track = 0;
 
-	track = ++track % 6;
-	sys::SoundManager::play(2 + track, sound_data[_n], sound_size[_n]);
+	track = ++track % 4;
+	sys::SoundManager::play(1 + track, sound_data[_n], sound_size[_n]);
 }
 
 
@@ -152,15 +150,6 @@ void	Scene::open_dialog(void)
 		}
 	}
 	JAVA_END
-}
-
-
-/************
-    ダミー
- ************/
-Scene*	scene_end(void)
-{
-	return	reinterpret_cast<Scene*>(NULL);
 }
 
 /********************* End of File **********************************************/

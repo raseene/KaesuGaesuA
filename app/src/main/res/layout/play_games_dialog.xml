@@ -5,30 +5,30 @@
 
 	<Button
 		android:id="@+id/button_sign"
-		android:layout_width="fill_parent"
-		android:layout_height="wrap_content"
+		android:layout_width="@dimen/btn_games_width"
+		android:layout_height="@dimen/btn_games_height"
 		android:layout_gravity="center_horizontal"
 		android:text="@string/btn_sign_in"
-		android:textSize="20sp"
+		android:textSize="@dimen/btn_games_text"
 		android:drawableLeft="@drawable/btn_google"
 		android:layout_marginLeft="16dp"
 		android:layout_marginTop="8dp"
 		android:layout_marginRight="16dp"
-		android:layout_marginBottom="8dp"
+		android:layout_marginBottom="16dp"
 		android:paddingTop="4dp"
 		android:paddingBottom="4dp"
 		android:paddingLeft="8dp"
-		android:paddingRight="0dp"
+		android:paddingRight="12dp"
 		android:background="@drawable/shape_button"
 	/>
 
 	<Button
 		android:id="@+id/button_achievement"
-		android:layout_width="fill_parent"
-		android:layout_height="wrap_content"
+		android:layout_width="@dimen/btn_games_width"
+		android:layout_height="@dimen/btn_games_height"
 		android:layout_gravity="center_horizontal"
 		android:text="@string/btn_achievement"
-		android:textSize="20sp"
+		android:textSize="@dimen/btn_games_text"
 		android:drawableLeft="@drawable/btn_achievement"
 		android:layout_marginLeft="16dp"
 		android:layout_marginTop="8dp"
@@ -37,7 +37,7 @@
 		android:paddingTop="4dp"
 		android:paddingBottom="4dp"
 		android:paddingLeft="8dp"
-		android:paddingRight="0dp"
+		android:paddingRight="12dp"
 		android:background="@drawable/shape_button"
 	/>
 

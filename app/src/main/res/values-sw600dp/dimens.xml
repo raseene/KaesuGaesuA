@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<dimen name="image_size">96dp</dimen>
+	<dimen name="font_size">16sp</dimen>
+	<dimen name="title_size">20sp</dimen>
+	<dimen name="text_size">18dp</dimen>
+
+	<dimen name="padding_right">20dp</dimen>
+	<dimen name="padding_top">12dp</dimen>
+
+	<dimen name="btn_games_width">320dp</dimen>
+	<dimen name="btn_games_height">64dp</dimen>
+	<dimen name="btn_games_text">28sp</dimen>
+</resources>
