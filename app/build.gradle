@@ -10,8 +10,10 @@ android {
         versionName '1.2.2'
         minSdkVersion 14
         targetSdkVersion 28
+
         ndk {
             moduleName "native"
+            abiFilters 'armeabi-v7a'
         }
     }
 
@@ -23,10 +25,11 @@ android {
             storePassword System.getenv("PASSWORD")
         }
     }
+
     buildTypes {
         debug {
-            applicationIdSuffix '.debug'
-            versionNameSuffix 'd'
+            applicationIdSuffix = '.debug'
+            versionNameSuffix = 'd'
             debuggable true
             jniDebuggable true
         }
@@ -36,17 +39,23 @@ android {
             debuggable false
             jniDebuggable false
             signingConfig signingConfigs.releaseKey
-        }
-    }
-    sourceSets {
-        main {
-            jni.srcDirs = []
-            jniLibs.srcDir "src/main/libs"
+
+            externalNativeBuild {
+                ndkBuild {
+                    cFlags '-Ofast'
+                }
+            }
         }
     }
 
     dexOptions {
         javaMaxHeapSize "2g"
+    }
+
+    externalNativeBuild {
+        ndkBuild {
+            path file('src/main/jni/Android.mk')
+        }
     }
 }
 
@@ -59,47 +68,4 @@ dependencies {
     implementation 'com.android.support:cardview-v7:25.3.1'
     implementation 'com.android.support.constraint:constraint-layout:1.0.2'
     implementation project(':nendSDK')
-}
-
-
-import org.apache.tools.ant.taskdefs.condition.Os
-
-def getNdkFolder() {
-    Properties properties = new Properties()
-    properties.load(project.rootProject.file('local.properties').newDataInputStream())
-    def ndkdir = properties.getProperty('ndk.dir', null)
-
-    if (ndkdir == null) {
-        if (System.env.ANDROID_NDK_ROOT != null) {
-            ndkdir = System.env.ANDROID_NDK_ROOT
-        } else if (System.env.NDK_ROOT != null) {
-            ndkdir = System.env.NDK_ROOT
-        } else if (System.env.NDKROOT != null) {
-            ndkdir = System.env.NDKROOT
-        } else if (System.env.NDK != null) {
-            ndkdir = System.env.NDK
-        } else {
-            throw new GradleException("NDK location not found. Define location with ndk.dir in the local.properties file or with an ANDROID_NDK_ROOT/NDK_ROOT/NDKROOT/NDK environment variable.")
-        }
-    }
-    if (!ndkdir.endsWith('/')) {
-        ndkdir = ndkdir + File.separator;
-    }
-    return ndkdir
-}
-
-task ndkBuild(type: Exec, description: 'Compile JNI source via NDK') {
-    println('executing ndkBuild')
-    def ndkBuildingDir = getNdkFolder();
-    def ndkBuildPath
-    if (Os.isFamily(Os.FAMILY_WINDOWS)) {
-        ndkBuildPath = ndkBuildingDir + 'ndk-build.cmd'
-    } else {
-        ndkBuildPath = ndkBuildingDir + 'ndk-build'
-    }
-    commandLine ndkBuildPath, '-j4', '-C', file('src/main').absolutePath
-}
-
-tasks.withType(JavaCompile) {
-    compileTask -> compileTask.dependsOn ndkBuild
 }
