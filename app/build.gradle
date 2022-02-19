@@ -1,19 +1,21 @@
-apply plugin: 'com.android.application'
+plugins {
+    id 'com.android.application'
+}
 
 android {
-    compileSdkVersion 28
-    buildToolsVersion '28.0.3'
+    compileSdk 31
 
     defaultConfig {
         applicationId "jp.so_raseene.kaesu"
-        versionCode 8
-        versionName '1.2.2'
-        minSdkVersion 14
-        targetSdkVersion 28
+        minSdk 21
+        targetSdk 31
+        versionCode 11
+        versionName "1.3.0"
 
-        ndk {
-            moduleName "native"
-            abiFilters 'armeabi-v7a'
+        externalNativeBuild {
+            cmake {
+                cppFlags ''
+            }
         }
     }
 
@@ -28,44 +30,53 @@ android {
 
     buildTypes {
         debug {
+//            ndk {
+//                abiFilters 'armeabi-v7a'
+//            }
             applicationIdSuffix = '.debug'
             versionNameSuffix = 'd'
             debuggable true
-            jniDebuggable true
         }
         release {
-            minifyEnabled true
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-project.txt'
+//            minifyEnabled true
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             debuggable false
-            jniDebuggable false
             signingConfig signingConfigs.releaseKey
-
-            externalNativeBuild {
-                ndkBuild {
-                    cFlags '-Ofast'
-                }
-            }
         }
     }
-
-    dexOptions {
-        javaMaxHeapSize "2g"
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
-
     externalNativeBuild {
-        ndkBuild {
-            path file('src/main/jni/Android.mk')
+        cmake {
+            path file('src/main/cpp/CMakeLists.txt')
+            version '3.18.1'
         }
+    }
+    buildFeatures {
+        prefab true
+        viewBinding true
+    }
+    lintOptions {
+        baseline file("lint-baseline.xml")
     }
 }
 
 dependencies {
-    implementation 'com.android.support:support-v4:25.3.1'
-    implementation 'com.google.android.gms:play-services-plus:11.0.4'
-    implementation 'com.google.android.gms:play-services-games:11.0.4'
-    implementation 'com.google.android.gms:play-services-ads:11.0.4'
-    implementation project(':BaseGameUtils')
-    implementation 'com.android.support:cardview-v7:25.3.1'
-    implementation 'com.android.support.constraint:constraint-layout:1.0.2'
-    implementation project(':nendSDK')
+    implementation 'androidx.appcompat:appcompat:1.4.1'
+    implementation "androidx.cardview:cardview:1.0.0"
+
+    implementation 'com.google.android.gms:play-services-plus:17.0.0'
+    implementation 'com.google.android.gms:play-services-games:22.0.1'
+    implementation "com.google.android.gms:play-services-auth:20.1.0"
+
+    implementation "androidx.games:games-frame-pacing:1.9.1"
+    implementation "androidx.games:games-performance-tuner:1.5.0"
+    implementation "androidx.games:games-activity:1.1.0-rc01"
+//    implementation "androidx.games:games-controller:1.1.0-alpha01"
+//    implementation "androidx.games:games-text-input:1.1.0-beta01"
+
+    implementation 'net.nend.android:nend-sdk:8.1.0'
 }

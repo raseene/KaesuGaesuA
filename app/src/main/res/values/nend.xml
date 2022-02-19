@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <integer name="banner_id">3174</integer>
+    <string name="banner_key">c5cb8bc474345961c6e7a9778c947957ed8e1e4f</string>
+    <integer name="rect_id">70357</integer>
+    <string name="rect_key">499f011dbec5d37cfa388b749aed2bfff440a794</string>
+    <integer name="native_id">485516</integer>
+    <string name="native_key">16cb170982088d81712e63087061378c71e8aa5c</string>
+    <integer name="movie_id">802559</integer>
+    <string name="movie_key">e9527a2ac8d1f39a667dfe0f7c169513b090ad44</string>
+
+</resources>
